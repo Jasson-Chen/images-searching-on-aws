@@ -36,29 +36,34 @@ Amazon Lambda: 是Amazon Serverless的计算服务，在这边封装了image sea
 
 利用 ARM 架构 EC2 （如T4g），Amazon linux 2023 系统部署参考
 
-```
-yum install npm
-npm install -g aws-cdk
-npm install docker 
-service docker start
-```
+1. 开启SSH访问安全组
+2. 采用Session Manager方式连接到EC2
+3. 配置对应Session Manager的IAM Role（在实例描述中可以找到）权限如下图所示
+   ![1729170034791](image/iam_config.png)
+4. 运行以下命令
 
-```
-# 登陆aws public ECR 获取基础镜像（多阶段构建，这边是通过Lambda Web Adapter的镜像层构建Lambda容器）
-aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-```
+    ```
+    yum install npm
+    npm install -g aws-cdk
+    npm install docker 
+    service docker start
+    ```
 
+    ```
+    # 登陆aws public ECR 获取基础镜像（多阶段构建，这边是通过Lambda Web Adapter的镜像层构建Lambda容器）
+    aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+    ```
 
-```
-# CDK依赖
-npm install
+    ```
+    # CDK依赖
+    npm install
 
-# CDK在AWS上做环境准备的。引导Stacksets在AWS环境配置S3存储桶和ECR镜像仓库的配置
-cdk bootstrap
+    # CDK在AWS上做环境准备的。引导Stacksets在AWS环境配置S3存储桶和ECR镜像仓库的配置
+    cdk bootstrap
 
-# CDK进行部署
-cdk deploy
-```
+    # CDK进行部署
+    cdk deploy
+    ```
 
 ## 测试说明
 
