@@ -1,4 +1,4 @@
-# Images 多模态RAG 应用Workshop
+# Images 多模态搜索
 
 #### 业务背景
 
@@ -18,9 +18,9 @@
 
 ## 架构说明
 
-![1729170034791](image/README/1729170034791.png)
+![1729170034791](image/1729170034791.png)
 
-![1729170049892](image/README/1729170049892.png)
+![1729170049892](image/1729170049892.png)
 
 **组件说明**
 
@@ -32,33 +32,39 @@ Amazon S3:  Amazon S3是高可用的，几乎无限扩张的对象存储服务, 
 
 Amazon Lambda: 是Amazon Serverless的计算服务，在这边封装了image search的API如upload image/search image等
 
-Rerank:  这个组件是借助基于prompt Engineering的rerank，通过配置的prompt设计，将候选结果和查询一起输入到LLM，让LLM生成一个新的排序来表示候选结果的相关性。
-
-
-## 本地开发说明
-
-cd lambda
-
-uvicorn index:app --reload
-
 ## 部署说明
 
-### 前提
-
-1. 安装python 版本>3.9 npm 及cdk
-2. [安装与配置AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-3. 安装[AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
-4. 安装docker
-
-Amazon linux 2023 参考
+利用 ARM 架构 EC2 （如T4g），Amazon linux 2023 系统部署参考
 
 ```
 yum install npm
 npm install -g aws-cdk
 npm install docker 
 service docker start
+```
 
 ```
+# 登陆aws public ECR 获取基础镜像（多阶段构建，这边是通过Lambda Web Adapter的镜像层构建Lambda容器）
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+```
+
+
+```
+# CDK依赖
+npm install
+
+# CDK在AWS上做环境准备的。引导Stacksets在AWS环境配置S3存储桶和ECR镜像仓库的配置
+cdk bootstrap
+
+# CDK进行部署
+cdk deploy
+```
+
+## 测试说明
+
+1. 利用ssh远程连接ec2，并map到本地8888端口，启动Jupyter notebook服务器
+
+2. 上传 .ipynb 文件，根据注释修改对应内容并进行测试即可
 
 ### 工程结构说明
 
@@ -74,34 +80,6 @@ service docker start
 ├── lambda     //业务逻辑
 ├── lib
 ├── package.json
-├── tsconfig.json
-└── web     // 前端UI，通过node运行
+└── tsconfig.json
 ```
 
-### Quick Start
-
-
-```
-# 登陆aws public ECR 获取基础镜像（多阶段构建，这边是通过Lambda Web Adapter的镜像层构建Lambda容器）
-aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-```
-
-
-```
-# CDK依赖
-npm install
-# CDK在AWS上做环境准备的。引导Stacksets在AWS环境配置S3存储桶和ECR镜像仓库的配置
-cdk bootstrap
-# 
-cdk deploy
-```
-
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
