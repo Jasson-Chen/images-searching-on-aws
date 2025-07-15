@@ -21,11 +21,12 @@ Amazon Lambda: 是Amazon Serverless的计算服务，在这边封装了image sea
 
 利用 ARM 架构 EC2 （如T4g），Amazon linux 2023 系统部署参考
 
-1. 开启SSH访问安全组
-2. 采用Session Manager方式连接到EC2
-3. 配置对应Session Manager的IAM Role（在实例描述中可以找到）权限如下图所示
+1. 配置安全组允许SSH访问
+2. 配置Amazon Bedrock 允许访问 Amazon Nova Pro 和 Amazon Titan Embed Img V1
+3. 采用Session Manager方式连接到EC2
+4. 配置对应Session Manager的IAM Role（在实例描述中可以找到）权限如下图所示
    ![1729170034791](image/iam_config.png)
-4. 运行以下命令
+5. 运行以下命令
 
     ```
     sudo yum install npm
